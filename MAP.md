@@ -10,6 +10,7 @@
 - `.../data/Prefs.kt`: saved choices (icon style, colors)
 - `.../ui/AppActions.kt`: opens the permission / auto-remove / uninstall screens for an app
 - `.../ui/ScanScreen.kt`, `AppsScreen.kt`, `DeviceScreen.kt`, `SettingsScreen.kt`
+- `SettingsScreen.kt` has Monitoring toggles and icon/color pickers
 - `.../ui/Theme.kt`: colors (object C); `ColorWheel.kt`: color picker
 - `.../settings/AppIcon.kt`, `IconShapes.kt`: icon styles, 456 manifest aliases, home shortcut
 - `app/src/test/...`: RiskTest, DeviceChecksTest, ScanTest, MonitorTest (run in CI)

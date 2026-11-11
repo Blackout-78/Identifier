@@ -20,4 +20,5 @@ A private security and privacy checker for Android. Fully offline: no internet p
 - Phase 4: Scan tab (security score, findings worst first, tap to fix). Done.
 - Phase 5: live monitoring (camera and mic watcher, persistent notification, alerts, event log). Done.
 - Phase 6: one-tap to an app's permission screen, auto-remove for unused apps, uninstall. Done.
-- Next: optional hard block, final test pass.
+- Phase 8: Settings toggles (monitoring, screen-off alert, clear log), color and icon switching, full test pass. Done.
+- Phase 7 (hard block, root or device-owner) was skipped on purpose.

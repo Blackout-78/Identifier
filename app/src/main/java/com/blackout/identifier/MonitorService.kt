@@ -75,7 +75,7 @@ class MonitorService : Service() {
         val e = Monitor.classify(System.currentTimeMillis(), sensor, active, screenOn, if (active && screenOn) onScreenApp() else null)
         EventStore.append(this, e)
         nm.notify(ID_WATCH, watchNotification())
-        if (e.suspicious) {
+        if (e.suspicious && Prefs.alertScreenOff) {
             val n = Notification.Builder(this, CH_ALERT)
                 .setSmallIcon(R.drawable.ic_stat_shield)
                 .setContentTitle("${sensor.label} turned on")

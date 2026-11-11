@@ -47,6 +47,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.blackout.identifier.MonitorService
+import com.blackout.identifier.data.EventStore
 import com.blackout.identifier.data.Prefs
 import com.blackout.identifier.settings.AppIcon
 import com.blackout.identifier.settings.IconShapes
@@ -56,11 +58,36 @@ fun SettingsScreen() {
     Column(Modifier.fillMaxSize().background(C.Bg).statusBarsPadding()) {
         Text("Settings", color = C.Text, fontSize = 22.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 20.dp, top = 20.dp, bottom = 12.dp))
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 14.dp)) {
+            Section("MONITORING") { MonitorSection() }
             Section("APP ICON") { IconSection() }
             Text("Identifier works fully offline. It has no internet permission and keeps everything on this phone.",
                 color = C.Sub, fontSize = 12.sp, modifier = Modifier.padding(6.dp))
         }
     }
+}
+
+@Composable
+private fun MonitorSection() {
+    val context = LocalContext.current
+    var on by remember { mutableStateOf(Prefs.monitorOn) }
+    var alert by remember { mutableStateOf(Prefs.alertScreenOff) }
+    fun turnOn() { Prefs.monitorOn = true; on = true; MonitorService.start(context) }
+    val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { turnOn() }
+
+    Row2("Live monitoring", "Watches the camera and mic. Shows a notification while on.") {
+        Toggle(on) { want ->
+            if (!want) { Prefs.monitorOn = false; on = false; MonitorService.stop(context) }
+            else if (android.os.Build.VERSION.SDK_INT >= 33 && !MonitorService.canNotify(context)) ask.launch(Manifest.permission.POST_NOTIFICATIONS)
+            else turnOn()
+        }
+    }
+    Row2("Alert when screen is off", "Loud alert if the camera or mic starts while the screen is off.") {
+        Toggle(alert) { alert = it; Prefs.alertScreenOff = it }
+    }
+    Row2("Clear event log", "Deletes the saved camera and mic events from this phone.", divider = false, onClick = {
+        EventStore.clear(context)
+        Toast.makeText(context, "Event log cleared", Toast.LENGTH_SHORT).show()
+    }) { Text("›", color = C.Sub, fontSize = 20.sp) }
 }
 
 @Composable

@@ -16,6 +16,9 @@ object EventStore {
         }
     }
 
+    @Synchronized
+    fun clear(context: Context) { runCatching { file(context).delete() } }
+
     /** Newest first. */
     @Synchronized
     fun read(context: Context, limit: Int = Monitor.LOG_CAP): List<SensorEvent> = runCatching {
