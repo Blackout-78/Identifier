@@ -3,10 +3,11 @@
 - `.../data/Risk.kt`: app risk levels, tags, filters (pure logic)
 - `.../data/AppScanner.kt`: reads installed apps and permissions
 - `.../data/DeviceChecks.kt`: the 6 device checks and PASS/WARN/FAIL rules (pure logic)
+- `.../data/Scan.kt`: score, grade, findings list worst first (pure logic)
 - `.../data/DeviceScanner.kt`: reads the phone's own settings for those checks
 - `.../data/Prefs.kt`: saved choices (icon style, colors)
-- `.../ui/AppsScreen.kt`, `DeviceScreen.kt`, `SettingsScreen.kt`, `Screens.kt` (Scan placeholder)
+- `.../ui/ScanScreen.kt`, `AppsScreen.kt`, `DeviceScreen.kt`, `SettingsScreen.kt`
 - `.../ui/Theme.kt`: colors (object C); `ColorWheel.kt`: color picker
 - `.../settings/AppIcon.kt`, `IconShapes.kt`: icon styles, 456 manifest aliases, home shortcut
-- `app/src/test/...`: RiskTest, DeviceChecksTest (run in CI)
+- `app/src/test/...`: RiskTest, DeviceChecksTest, ScanTest (run in CI)
 - `.github/workflows/build.yml`: test, build, sign, publish APK; `.github/guard/`: security guard
