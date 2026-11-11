@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
+    <!-- Lets the Device tab see whether your Wi-Fi is open or protected. Not location, not the network name. -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <!-- Lets Identifier list every app you installed, so it can check their permissions. Nothing is sent anywhere. -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <!-- Optional. You turn it on yourself in Android settings. Used only to show when each app was last used. -->

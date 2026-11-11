@@ -29,4 +29,3 @@ private fun Placeholder(title: String, note: String) {
 }
 
 @Composable fun ScanScreen() = Placeholder("Scan", "Security score and findings arrive in the next phases.")
-@Composable fun DeviceScreen() = Placeholder("Device", "Screen lock, encryption and patch checks will appear here.")
