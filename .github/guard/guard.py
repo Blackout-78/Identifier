@@ -122,7 +122,7 @@ def check_manifest(path, allow_internet, flag):
         if perm == "INTERNET" and not allow_internet:
             flag("permission", path, "INTERNET permission added (this app must stay offline)")
         if perm in RISKY_PERMS:
-            flag("permission", path, f"risky permission {perm}")
+            flag("permission", f"{path}#{perm}", f"risky permission {perm}")
     app = root.find("application")
     if app is not None:
         if app.get(ANDROID + "usesCleartextTraffic") == "true":

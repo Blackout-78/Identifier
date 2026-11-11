@@ -49,6 +49,11 @@ jobs:
           echo "SIGNING_STORE_PASSWORD=$PW" >> "$GITHUB_ENV"
           echo "SIGNING_KEY_ALIAS=$(printf '%s' "${{ secrets.KEY_ALIAS }}" | tr -d ' \r\n\t')" >> "$GITHUB_ENV"
 
+      - name: Run the tests (blocks the build if one fails)
+        run: |
+          chmod +x gradlew
+          ./gradlew testDebugUnitTest --no-daemon
+
       - name: Build the APK
         run: |
           chmod +x gradlew

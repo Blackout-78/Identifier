@@ -1,2 +1,4 @@
 # Lines here let the security guard accept something on purpose.
 # Format:  <rule> <path>     rules: key, permission, code, unicode, binary
+# Lists every installed app so permissions can be checked. Never sent anywhere (the app has no internet permission).
+permission app/src/main/AndroidManifest.xml#QUERY_ALL_PACKAGES
