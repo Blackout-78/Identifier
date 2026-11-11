@@ -2,7 +2,6 @@ package com.blackout.identifier.ui
 
 import android.content.Intent
 import android.Manifest
-import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -184,12 +183,11 @@ private fun FindingRow(f: Finding) {
     Row(
         Modifier.fillMaxWidth().heightIn(min = 60.dp).clip(shape).background(C.Card).border(BorderStroke(1.dp, C.Line), shape)
             .clickable {
-                val intent = when {
-                    f.fix.checkId != null -> Intent(deviceAction(f.fix.checkId))
-                    f.fix.pkg != null -> Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", f.fix.pkg, null))
-                    else -> null
+                when {
+                    f.fix.checkId != null -> runCatching { context.startActivity(Intent(deviceAction(f.fix.checkId))) }
+                    f.fix.pkg != null && f.fix.autoRevoke -> AppActions.openAutoRevoke(context, f.fix.pkg)
+                    f.fix.pkg != null -> AppActions.openPermissions(context, f.fix.pkg)
                 }
-                if (intent != null) runCatching { context.startActivity(intent) }
             }.padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),

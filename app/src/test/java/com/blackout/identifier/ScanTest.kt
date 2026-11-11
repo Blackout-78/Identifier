@@ -18,8 +18,8 @@ class ScanTest {
     private val day = Risk.DAY_MS
 
     private fun check(id: CheckId, s: Status) = Check(id, id.name, "detail", s)
-    private fun app(name: String, level: Level, tags: List<Tag>, last: Long? = now) =
-        AppInfo(name, "pkg.$name", level, tags, last)
+    private fun app(name: String, level: Level, tags: List<Tag>, last: Long? = now, autoOff: Boolean = false) =
+        AppInfo(name, "pkg.$name", level, tags, last, autoOff)
 
     private val allPass = CheckId.values().map { check(it, Status.PASS) }
 
@@ -97,5 +97,18 @@ class ScanTest {
         assertEquals("Fair", Scan.grade(84))
         assertEquals("At risk", Scan.grade(40))
         assertEquals("Danger", Scan.grade(39))
+    }
+
+    @Test fun unusedAppWithAutoRemoveOffPointsToThatScreen() {
+        val apps = listOf(app("Old", Level.MEDIUM, listOf(Tag.CAMERA), last = now - 45 * day, autoOff = true))
+        val f = Scan.build(allPass, apps, now).findings.single()
+        assertTrue(f.fix.autoRevoke)
+        assertTrue(f.detail.contains("Auto-remove is off"))
+    }
+
+    @Test fun usedAppWithAutoRemoveOffIsLeftAlone() {
+        val apps = listOf(app("Fresh", Level.HIGH, listOf(Tag.OVERLAY), last = now, autoOff = true))
+        val f = Scan.build(allPass, apps, now).findings.single()
+        assertFalse(f.fix.autoRevoke)
     }
 }

@@ -33,9 +33,14 @@ class AppFacts(
     val backgroundCapable: Boolean,
     /** null = unknown (usage access not given), 0 = not used in the last year. */
     val lastUsedMs: Long?,
+    /** True if Android's own "remove permissions if unused" is switched off for this app. */
+    val autoRevokeOff: Boolean = false,
 )
 
-class AppInfo(val label: String, val pkg: String, val level: Level, val tags: List<Tag>, val lastUsedMs: Long?)
+class AppInfo(
+    val label: String, val pkg: String, val level: Level, val tags: List<Tag>, val lastUsedMs: Long?,
+    val autoRevokeOff: Boolean = false,
+)
 
 enum class AppFilter { ALL, RISKY, BACKGROUND, UNUSED }
 
@@ -78,7 +83,7 @@ object Risk {
         var level = tags.firstOrNull()?.level ?: Level.CLEAN
         // Mic or camera in an app that can run in the background is the case worth warning about.
         if (f.backgroundCapable && (Tag.MIC in found || Tag.CAMERA in found)) level = Level.HIGH
-        return AppInfo(f.label, f.pkg, level, tags, f.lastUsedMs)
+        return AppInfo(f.label, f.pkg, level, tags, f.lastUsedMs, f.autoRevokeOff)
     }
 
     fun sorted(apps: List<AppInfo>): List<AppInfo> =

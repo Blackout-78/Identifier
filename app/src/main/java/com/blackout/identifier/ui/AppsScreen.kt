@@ -1,7 +1,6 @@
 package com.blackout.identifier.ui
 
 import android.content.Intent
-import android.net.Uri
 import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -153,12 +152,11 @@ private fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
 private fun AppCard(a: AppInfo, now: Long) {
     val context = LocalContext.current
     val shape = RoundedCornerShape(14.dp)
+    var menu by remember { mutableStateOf(false) }
+    if (menu) AppMenu(a) { menu = false }
     Column(
         Modifier.fillMaxWidth().clip(shape).background(C.Card).border(BorderStroke(1.dp, C.Line), shape)
-            .clickable {
-                // Opens this app's own settings page, where you can take its permissions away.
-                runCatching { context.startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:${a.pkg}"))) }
-            }.padding(12.dp),
+            .clickable { menu = true }.padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -191,4 +189,37 @@ private fun TagPill(t: Tag) {
     }
     Text(t.label, color = fg, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1,
         modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(bg).padding(horizontal = 8.dp, vertical = 4.dp))
+}
+
+/** One tap to the screen where you take permissions away, turn on auto-remove, or uninstall. */
+@Composable
+private fun AppMenu(a: AppInfo, onClose: () -> Unit) {
+    val context = LocalContext.current
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onClose,
+        containerColor = C.Card,
+        title = { Text(a.label, color = C.Text, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                MenuButton("Remove permissions", "Opens this app's permission list") { AppActions.openPermissions(context, a.pkg); onClose() }
+                if (android.os.Build.VERSION.SDK_INT >= 30) {
+                    MenuButton(
+                        "Auto-remove when unused",
+                        if (a.autoRevokeOff) "Currently off. Turn it on" else "Android removes its permissions if you stop using it",
+                    ) { AppActions.openAutoRevoke(context, a.pkg); onClose() }
+                }
+                MenuButton("Uninstall", "Removes the app") { AppActions.uninstall(context, a.pkg); onClose() }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { androidx.compose.material3.TextButton(onClick = onClose) { Text("Cancel", color = C.Sub) } },
+    )
+}
+
+@Composable
+private fun MenuButton(title: String, sub: String, onClick: () -> Unit) {
+    Column(Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(10.dp)).clickable(onClick = onClick).padding(vertical = 8.dp, horizontal = 4.dp)) {
+        Text(title, color = C.AccentSoft, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+        Text(sub, color = C.Sub, fontSize = 12.sp)
+    }
 }

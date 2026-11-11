@@ -8,6 +8,7 @@
 - `.../MonitorService.kt`: foreground service, camera/mic watchers, alerts; `BootReceiver` restarts it
 - `.../data/DeviceScanner.kt`: reads the phone's own settings for those checks
 - `.../data/Prefs.kt`: saved choices (icon style, colors)
+- `.../ui/AppActions.kt`: opens the permission / auto-remove / uninstall screens for an app
 - `.../ui/ScanScreen.kt`, `AppsScreen.kt`, `DeviceScreen.kt`, `SettingsScreen.kt`
 - `.../ui/Theme.kt`: colors (object C); `ColorWheel.kt`: color picker
 - `.../settings/AppIcon.kt`, `IconShapes.kt`: icon styles, 456 manifest aliases, home shortcut

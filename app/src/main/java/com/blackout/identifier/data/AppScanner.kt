@@ -46,6 +46,10 @@ object AppScanner {
         }.getOrNull()
     }
 
+    /** Android 11+ only. Apps on the exempt list keep their permissions even when unused. */
+    private fun autoRevokeOff(pm: PackageManager, pkg: String): Boolean =
+        Build.VERSION.SDK_INT >= 30 && runCatching { pm.isAutoRevokeWhitelisted(pkg) }.getOrDefault(false)
+
     @Suppress("DEPRECATION")
     fun scan(context: Context): List<AppInfo> {
         val pm = context.packageManager
@@ -76,6 +80,7 @@ object AppScanner {
                         accessibility = p.packageName in accessibility,
                         backgroundCapable = BOOT in requested || FOREGROUND in requested,
                         lastUsedMs = if (usage == null) null else (usage[p.packageName] ?: 0L),
+                        autoRevokeOff = autoRevokeOff(pm, p.packageName),
                     ),
                 ),
             )

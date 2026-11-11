@@ -3,7 +3,7 @@ package com.blackout.identifier.data
 /** Plain logic with no Android code, so it can be tested on its own. */
 
 /** Where a tap on a finding should go. One of the two is set. */
-class Fix(val checkId: CheckId? = null, val pkg: String? = null)
+class Fix(val checkId: CheckId? = null, val pkg: String? = null, val autoRevoke: Boolean = false)
 
 class Finding(val key: String, val title: String, val detail: String, val level: Level, val fix: Fix, val points: Int)
 
@@ -66,7 +66,9 @@ object Scan {
         val shown = a.tags.filter { it != Tag.BACKGROUND }.joinToString(", ") { it.label.lowercase() }
         if (shown.isNotEmpty()) parts.add("Has: $shown")
         if (unused) parts.add(Risk.agoText(nowMs, a.lastUsedMs))
+        val autoRevoke = unused && a.autoRevokeOff
+        if (autoRevoke) parts.add("Auto-remove is off. Tap to turn it on")
         val points = if (level == Level.HIGH) APP_HIGH_POINTS else APP_UNUSED_POINTS
-        return Finding("app:${a.pkg}", a.label, parts.joinToString(". "), level, Fix(pkg = a.pkg), points)
+        return Finding("app:${a.pkg}", a.label, parts.joinToString(". "), level, Fix(pkg = a.pkg, autoRevoke = autoRevoke), points)
     }
 }
