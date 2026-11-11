@@ -14,6 +14,13 @@
     <!-- Optional. You turn it on yourself in Android settings. Used only to show when each app was last used. -->
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
 
+    <!-- Live monitoring: a notification that stays up while Identifier watches the camera and mic. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Puts monitoring back after a restart, only if you turned it on. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
     <application
         android:name=".IdentifierApp"
         android:allowBackup="false"
@@ -28,6 +35,21 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
+
+        <service
+            android:name=".MonitorService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Watches camera and microphone use on this phone and shows a notification" />
+        </service>
+
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
 
         <!-- The app drawer icon. Settings > App icon switches to one of the ready-made designs below. -->
         <activity-alias

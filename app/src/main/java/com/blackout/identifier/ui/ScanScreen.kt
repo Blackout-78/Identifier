@@ -1,7 +1,15 @@
 package com.blackout.identifier.ui
 
 import android.content.Intent
+import android.Manifest
 import android.net.Uri
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import java.text.DateFormat
+import java.util.Date
 import android.provider.Settings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -51,6 +59,11 @@ import com.blackout.identifier.data.Finding
 import com.blackout.identifier.data.Level
 import com.blackout.identifier.data.Scan
 import com.blackout.identifier.data.ScanReport
+import com.blackout.identifier.data.EventStore
+import com.blackout.identifier.data.Monitor
+import com.blackout.identifier.data.Prefs
+import com.blackout.identifier.data.SensorEvent
+import com.blackout.identifier.MonitorService
 
 private fun levelColor(l: Level) = when (l) {
     Level.HIGH -> C.Accent
@@ -77,6 +90,7 @@ fun ScanScreen() {
     val context = LocalContext.current
     var report by remember { mutableStateOf<ScanReport?>(null) }
     var refresh by remember { mutableIntStateOf(0) }
+    var events by remember { mutableStateOf<List<SensorEvent>>(emptyList()) }
 
     // Scan again every time you come back, for example after fixing something in Settings.
     LifecycleResumeEffect(Unit) {
@@ -89,6 +103,7 @@ fun ScanScreen() {
         Thread {
             runCatching { Scan.build(DeviceScanner.check(app), AppScanner.scan(app), System.currentTimeMillis()) }
                 .onSuccess { report = it }
+            events = EventStore.read(app, 5)
         }.start()
     }
 
@@ -105,6 +120,7 @@ fun ScanScreen() {
             contentPadding = PaddingValues(bottom = 16.dp),
         ) {
             item { ScoreCard(r) }
+            item { MonitorCard(events) }
             if (!r.unusedKnown) item { UsageHint() }
             if (r.findings.isEmpty()) {
                 item { Text("Nothing to fix.", color = C.Good, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp)) }
@@ -184,5 +200,58 @@ private fun FindingRow(f: Finding) {
             Text(f.detail, color = C.Sub, fontSize = 12.sp)
         }
         Text(f.level.label, color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun MonitorCard(events: List<SensorEvent>) {
+    val context = LocalContext.current
+    var on by remember { mutableStateOf(Prefs.monitorOn) }
+    val shape = RoundedCornerShape(14.dp)
+
+    fun turnOn() { Prefs.monitorOn = true; on = true; MonitorService.start(context) }
+    fun turnOff() { Prefs.monitorOn = false; on = false; MonitorService.stop(context) }
+
+    val ask = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { turnOn() }
+    // If it was on, make sure it is still running after the phone cleaned things up.
+    LaunchedEffect(Unit) { if (Prefs.monitorOn) MonitorService.start(context) }
+
+    Column(
+        Modifier.fillMaxWidth().clip(shape).background(C.Card).border(BorderStroke(1.dp, C.Line), shape).padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(Modifier.weight(1f)) {
+                Text("Live monitoring", color = C.Text, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    if (on) "On. A notification shows camera and mic use." else "Off. Turn on to watch camera and mic.",
+                    color = C.Sub, fontSize = 12.sp,
+                )
+            }
+            Switch(
+                checked = on,
+                onCheckedChange = { want ->
+                    if (!want) turnOff()
+                    else if (Build.VERSION.SDK_INT >= 33 && !MonitorService.canNotify(context)) ask.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    else turnOn()
+                },
+                colors = SwitchDefaults.colors(checkedTrackColor = C.Accent, checkedThumbColor = Color.White, uncheckedTrackColor = C.Line, uncheckedThumbColor = C.Sub),
+            )
+        }
+        if (events.isEmpty()) {
+            Text("No camera or mic events yet.", color = C.Sub, fontSize = 12.sp)
+        } else {
+            val fmt = remember { DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT) }
+            events.forEach { e ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.size(8.dp).clip(RoundedCornerShape(4.dp)).background(if (e.suspicious) C.Accent else if (e.active) C.Warn else C.Good))
+                    Column {
+                        Text(Monitor.describe(e), color = if (e.suspicious) C.AccentSoft else C.Text, fontSize = 12.sp)
+                        Text(fmt.format(Date(e.atMs)), color = C.Sub, fontSize = 11.sp)
+                    }
+                }
+            }
+        }
+        Text("Android does not say which app used the camera or mic. The app named is the one on screen then (needs usage access).", color = C.Sub, fontSize = 11.sp)
     }
 }

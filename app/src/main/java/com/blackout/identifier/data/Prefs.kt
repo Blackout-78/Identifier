@@ -23,4 +23,5 @@ object Prefs {
     var iconStyle: String get() = _iconStyle.value; set(v) { _iconStyle.value = v; sp.edit().putString("iconStyle", v).apply() }
     var iconMain: Int get() = _iconMain.intValue; set(v) { _iconMain.intValue = v; sp.edit().putInt("iconMain", v).apply() }
     var iconSecond: Int get() = _iconSecond.intValue; set(v) { _iconSecond.intValue = v; sp.edit().putInt("iconSecond", v).apply() }
+    var monitorOn: Boolean get() = sp.getBoolean("monitorOn", false); set(v) { sp.edit().putBoolean("monitorOn", v).apply() }
 }
