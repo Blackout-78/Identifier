@@ -5,6 +5,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,6 +72,10 @@ private fun Root() {
                 else -> SettingsScreen()
             }
         }
+        Text(
+            Version.tag, color = C.Sub, fontSize = 10.sp,
+            modifier = Modifier.fillMaxWidth().background(C.Bar).padding(start = 12.dp, top = 4.dp).clickable { tab = TABS.size - 1 },
+        )
         NavigationBar(containerColor = C.Bar, contentColor = C.Text) {
             TABS.forEachIndexed { i, t ->
                 NavigationBarItem(

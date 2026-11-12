@@ -62,6 +62,7 @@ fun SettingsScreen() {
             Section("APP ICON") { IconSection() }
             Text("Identifier works fully offline. It has no internet permission and keeps everything on this phone.",
                 color = C.Sub, fontSize = 12.sp, modifier = Modifier.padding(6.dp))
+            Text(com.blackout.identifier.Version.full, color = C.Sub, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp))
         }
     }
 }
