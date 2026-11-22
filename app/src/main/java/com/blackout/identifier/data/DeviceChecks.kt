@@ -4,7 +4,7 @@ import java.time.LocalDate
 
 enum class Status(val label: String) { PASS("PASS"), WARN("WARN"), FAIL("FAIL"), UNKNOWN("N/A") }
 
-enum class CheckId { LOCK, ENCRYPTION, PATCH, PLAY_PROTECT, DEV_OPTIONS, WIFI }
+enum class CheckId { LOCK, ENCRYPTION, PATCH, DEV_OPTIONS, WIFI }
 
 class Check(val id: CheckId, val title: String, val detail: String, val status: Status)
 
@@ -16,7 +16,6 @@ class DeviceFacts(
     val lockSet: Boolean,
     val encryptionStatus: Int?,   // DevicePolicyManager.ENCRYPTION_STATUS_* value
     val patch: String?,           // "YYYY-MM-DD"
-    val verifierOn: Int?,         // Settings.Global package_verifier_enable (1 on, 0 off)
     val devOptionsOn: Boolean,
     val usbDebuggingOn: Boolean,
     val wifiSecurity: Int?,       // WifiInfo.SECURITY_TYPE_* value, -1 = not connected, null = cannot read
@@ -38,7 +37,7 @@ object DeviceChecks {
     const val PATCH_OLD_DAYS = 365
 
     fun evaluate(f: DeviceFacts, todayEpochDay: Long): List<Check> = listOf(
-        lock(f), encryption(f), patch(f, todayEpochDay), playProtect(f), devOptions(f), wifi(f),
+        lock(f), encryption(f), patch(f, todayEpochDay), devOptions(f), wifi(f),
     )
 
     fun passed(list: List<Check>) = list.count { it.status == Status.PASS }
@@ -84,12 +83,6 @@ object DeviceChecks {
             else -> "Over a year old (${f.patch}). Check for updates"
         }
         return Check(CheckId.PATCH, "Security patch", detail, s)
-    }
-
-    private fun playProtect(f: DeviceFacts): Check = when (f.verifierOn) {
-        null -> Check(CheckId.PLAY_PROTECT, "Play Protect", "Could not be read on this phone", Status.UNKNOWN)
-        0 -> Check(CheckId.PLAY_PROTECT, "Play Protect", "App scanning is off", Status.FAIL)
-        else -> Check(CheckId.PLAY_PROTECT, "Play Protect", "App scanning is on", Status.PASS)
     }
 
     private fun devOptions(f: DeviceFacts): Check = when {

@@ -14,16 +14,16 @@ class DeviceChecksTest {
 
     private fun facts(
         lock: Boolean = true, enc: Int? = DeviceChecks.ENC_ACTIVE, patch: String? = "2026-10-05",
-        verifier: Int? = 1, dev: Boolean = false, adb: Boolean = false, wifi: Int? = 2,
-    ) = DeviceFacts(lock, enc, patch, verifier, dev, adb, wifi)
+        dev: Boolean = false, adb: Boolean = false, wifi: Int? = 2,
+    ) = DeviceFacts(lock, enc, patch, dev, adb, wifi)
 
     private fun status(id: CheckId, f: DeviceFacts) = DeviceChecks.evaluate(f, today).first { it.id == id }.status
 
-    @Test fun healthyPhonePassesAllSix() {
+    @Test fun healthyPhonePassesAllFive() {
         val list = DeviceChecks.evaluate(facts(), today)
-        assertEquals(6, list.size)
-        assertEquals(6, DeviceChecks.passed(list))
-        assertEquals("6 of 6 checks passed", DeviceChecks.summary(list))
+        assertEquals(5, list.size)
+        assertEquals(5, DeviceChecks.passed(list))
+        assertEquals("5 of 5 checks passed", DeviceChecks.summary(list))
     }
 
     @Test fun noScreenLockFails() = assertEquals(Status.FAIL, status(CheckId.LOCK, facts(lock = false)))
@@ -53,12 +53,6 @@ class DeviceChecksTest {
         assertNull(DeviceChecks.patchAgeDays("2026-13-45", today))
     }
 
-    @Test fun playProtect() {
-        assertEquals(Status.PASS, status(CheckId.PLAY_PROTECT, facts(verifier = 1)))
-        assertEquals(Status.FAIL, status(CheckId.PLAY_PROTECT, facts(verifier = 0)))
-        assertEquals(Status.UNKNOWN, status(CheckId.PLAY_PROTECT, facts(verifier = null)))
-    }
-
     @Test fun developerOptions() {
         assertEquals(Status.PASS, status(CheckId.DEV_OPTIONS, facts()))
         assertEquals(Status.WARN, status(CheckId.DEV_OPTIONS, facts(dev = true)))
@@ -74,13 +68,13 @@ class DeviceChecksTest {
     }
 
     @Test fun summaryMatchesTheApprovedDesign() {
-        // Design: lock, encryption, patch, Play Protect pass; developer options warns; open Wi-Fi fails.
+        // Design: lock, encryption, patch pass; developer options warns; open Wi-Fi fails.
         val list = DeviceChecks.evaluate(facts(dev = true, wifi = DeviceChecks.WIFI_OPEN), today)
-        assertEquals("4 of 6 checks passed", DeviceChecks.summary(list))
+        assertEquals("3 of 5 checks passed", DeviceChecks.summary(list))
     }
 
     @Test fun summaryCountsUnknowns() {
-        val list = DeviceChecks.evaluate(facts(verifier = null, wifi = null), today)
-        assertEquals("4 of 6 checks passed, 2 could not be checked", DeviceChecks.summary(list))
+        val list = DeviceChecks.evaluate(facts(wifi = null), today)
+        assertEquals("4 of 5 checks passed, 1 could not be checked", DeviceChecks.summary(list))
     }
 }

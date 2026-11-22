@@ -62,6 +62,10 @@ jobs:
           ./gradlew assembleRelease -PbuildNumber=${{ github.run_number }} --no-daemon
           cp app/build/outputs/apk/release/app-release.apk "Identifier-build-${{ github.run_number }}.apk"
 
+      - name: Remove keystore
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks"
+
       - name: Write what's new
         env:
           GH_TOKEN: ${{ github.token }}

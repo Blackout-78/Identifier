@@ -25,7 +25,6 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Security
 import androidx.compose.material.icons.outlined.SystemUpdate
-import androidx.compose.material.icons.outlined.VerifiedUser
 import androidx.compose.material.icons.outlined.Wifi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -56,14 +55,13 @@ private fun icon(id: CheckId): ImageVector = when (id) {
     CheckId.LOCK -> Icons.Outlined.Lock
     CheckId.ENCRYPTION -> Icons.Outlined.Security
     CheckId.PATCH -> Icons.Outlined.SystemUpdate
-    CheckId.PLAY_PROTECT -> Icons.Outlined.VerifiedUser
     CheckId.DEV_OPTIONS -> Icons.Outlined.Code
     CheckId.WIFI -> Icons.Outlined.Wifi
 }
 
 /** Where a tap on each row takes you, so you can fix it right there. */
 private fun settingsAction(id: CheckId): String = when (id) {
-    CheckId.LOCK, CheckId.ENCRYPTION, CheckId.PLAY_PROTECT -> Settings.ACTION_SECURITY_SETTINGS
+    CheckId.LOCK, CheckId.ENCRYPTION -> Settings.ACTION_SECURITY_SETTINGS
     CheckId.PATCH -> Settings.ACTION_DEVICE_INFO_SETTINGS
     CheckId.DEV_OPTIONS -> Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS
     CheckId.WIFI -> Settings.ACTION_WIFI_SETTINGS

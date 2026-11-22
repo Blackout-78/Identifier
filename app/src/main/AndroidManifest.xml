@@ -45,7 +45,7 @@
                 android:value="Watches camera and microphone use on this phone and shows a notification" />
         </service>
 
-        <receiver android:name=".BootReceiver" android:exported="true">
+        <receiver android:name=".BootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

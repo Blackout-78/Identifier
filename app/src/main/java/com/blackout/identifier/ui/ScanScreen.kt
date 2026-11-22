@@ -78,7 +78,7 @@ private fun scoreColor(score: Int) = when {
 }
 
 private fun deviceAction(id: CheckId): String = when (id) {
-    CheckId.LOCK, CheckId.ENCRYPTION, CheckId.PLAY_PROTECT -> Settings.ACTION_SECURITY_SETTINGS
+    CheckId.LOCK, CheckId.ENCRYPTION -> Settings.ACTION_SECURITY_SETTINGS
     CheckId.PATCH -> Settings.ACTION_DEVICE_INFO_SETTINGS
     CheckId.DEV_OPTIONS -> Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS
     CheckId.WIFI -> Settings.ACTION_WIFI_SETTINGS

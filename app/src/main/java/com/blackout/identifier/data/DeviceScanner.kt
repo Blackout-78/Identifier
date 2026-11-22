@@ -19,7 +19,6 @@ object DeviceScanner {
             lockSet = keyguard?.isDeviceSecure == true,
             encryptionStatus = runCatching { dpm?.storageEncryptionStatus }.getOrNull(),
             patch = Build.VERSION.SECURITY_PATCH.takeIf { it.isNotBlank() },
-            verifierOn = runCatching { Settings.Global.getInt(cr, "package_verifier_enable") }.getOrNull(),
             devOptionsOn = Settings.Global.getInt(cr, Settings.Global.DEVELOPMENT_SETTINGS_ENABLED, 0) == 1,
             usbDebuggingOn = Settings.Global.getInt(cr, Settings.Global.ADB_ENABLED, 0) == 1,
             wifiSecurity = wifiSecurity(context),
